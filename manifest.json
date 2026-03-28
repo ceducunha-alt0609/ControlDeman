@@ -1,0 +1,88 @@
+{
+  "name": "SindApp – Gestão Condominial",
+  "short_name": "SindApp",
+  "description": "Gestão Condominial Inteligente para Síndicos",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0d12",
+  "theme_color": "#63b3ed",
+  "orientation": "any",
+  "lang": "pt-BR",
+  "categories": ["productivity", "business", "utilities"],
+  "icons": [
+    {
+      "src": "icons/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/dashboard.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "label": "Dashboard do SindApp"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nova Demanda",
+      "short_name": "Demanda",
+      "description": "Crie uma nova demanda rapidamente",
+      "url": "./index.html#demands",
+      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Manutenções",
+      "short_name": "Manutenções",
+      "description": "Veja as manutenções pendentes",
+      "url": "./index.html#maintenance",
+      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

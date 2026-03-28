@@ -1,0 +1,2746 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f1117" />
+  <meta name="description" content="SindApp – Gestão Condominial Inteligente" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="SindApp" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <title>SindApp – Gestão Condominial</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@700;900&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Icons (Lucide via CDN) -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <style>
+    /* ═══════════════════════════════════════════════
+       CSS CUSTOM PROPERTIES & THEME SYSTEM
+    ═══════════════════════════════════════════════ */
+    :root {
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
+
+      --sidebar-w: 260px;
+      --header-h: 64px;
+
+      --rgb-accent: 99, 179, 237;
+      --accent: rgb(var(--rgb-accent));
+      --accent-glow: rgba(var(--rgb-accent), 0.25);
+      --accent-subtle: rgba(var(--rgb-accent), 0.1);
+
+      --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-spring: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+      --shadow-card: 0 4px 24px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.12);
+      --shadow-elevated: 0 16px 48px rgba(0,0,0,0.32), 0 4px 16px rgba(0,0,0,0.2);
+      --shadow-float: 0 32px 80px rgba(0,0,0,0.5), 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    /* DARK THEME (default) */
+    [data-theme="dark"] {
+      --bg-base: #0a0d12;
+      --bg-surface: #111520;
+      --bg-elevated: #161b28;
+      --bg-card: #1a2035;
+      --bg-hover: #202840;
+      --bg-glass: rgba(17, 21, 32, 0.7);
+      --border: rgba(255,255,255,0.07);
+      --border-accent: rgba(var(--rgb-accent), 0.3);
+      --text-primary: #eef1f8;
+      --text-secondary: #8892a4;
+      --text-muted: #4a5568;
+      --sidebar-bg: #0e1420;
+      --header-bg: rgba(10, 13, 18, 0.85);
+    }
+
+    /* LIGHT THEME */
+    [data-theme="light"] {
+      --bg-base: #f0f4f8;
+      --bg-surface: #ffffff;
+      --bg-elevated: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-hover: #e8f0fe;
+      --bg-glass: rgba(255, 255, 255, 0.75);
+      --border: rgba(0,0,0,0.08);
+      --border-accent: rgba(var(--rgb-accent), 0.4);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --sidebar-bg: #ffffff;
+      --header-bg: rgba(240, 244, 248, 0.9);
+      --shadow-card: 0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.05);
+      --shadow-elevated: 0 16px 48px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    /* ═══════════════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100dvh;
+      overflow-x: hidden;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    /* Noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.4;
+    }
+
+    /* ═══════════════════════════════════════════════
+       LAYOUT
+    ═══════════════════════════════════════════════ */
+    .app-shell {
+      display: flex;
+      min-height: 100dvh;
+    }
+
+    /* ═══════════════════════════════════════════════
+       SIDEBAR
+    ═══════════════════════════════════════════════ */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: var(--sidebar-w);
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      transition: transform var(--transition), background var(--transition), width var(--transition);
+      overflow: hidden;
+    }
+
+    .sidebar.collapsed { width: 68px; }
+    .sidebar.collapsed .nav-label,
+    .sidebar.collapsed .sidebar-logo-text,
+    .sidebar.collapsed .nav-badge,
+    .sidebar.collapsed .sidebar-section-label { opacity: 0; pointer-events: none; width: 0; overflow: hidden; }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 18px;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, rgb(var(--rgb-accent)), rgba(var(--rgb-accent), 0.5));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(var(--rgb-accent), 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo-icon::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.25), transparent);
+    }
+
+    .logo-icon svg { color: white; width: 20px; height: 20px; position: relative; z-index: 1; }
+
+    .sidebar-logo-text {
+      display: flex; flex-direction: column;
+      transition: opacity var(--transition), width var(--transition);
+    }
+    .sidebar-logo-text strong {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+    .sidebar-logo-text span {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 10px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .sidebar-section-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 16px 8px 6px;
+      transition: opacity var(--transition);
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition), transform 0.15s;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-weight: 500;
+      position: relative;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .nav-item:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+      transform: translateX(2px);
+    }
+
+    .nav-item.active {
+      background: var(--accent-subtle);
+      color: var(--accent);
+      border: 1px solid var(--border-accent);
+    }
+
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: -10px; top: 50%; transform: translateY(-50%);
+      width: 3px; height: 60%;
+      background: var(--accent);
+      border-radius: 0 4px 4px 0;
+    }
+
+    .nav-icon { width: 18px; height: 18px; flex-shrink: 0; }
+    .nav-label { flex: 1; transition: opacity var(--transition), width var(--transition); }
+
+    .nav-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      background: #ef4444;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 20px;
+      min-width: 20px;
+      text-align: center;
+      transition: opacity var(--transition);
+    }
+
+    .nav-badge.amber { background: #f59e0b; }
+    .nav-badge.blue { background: rgb(var(--rgb-accent)); }
+
+    .sidebar-footer {
+      padding: 12px 10px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    /* Version badge */
+    .version-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    /* Collapse toggle */
+    .collapse-btn {
+      position: absolute;
+      top: 22px;
+      right: -14px;
+      width: 28px; height: 28px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background var(--transition), transform var(--transition);
+      z-index: 10;
+      color: var(--text-secondary);
+    }
+    .collapse-btn:hover { background: var(--accent-subtle); color: var(--accent); }
+    .sidebar.collapsed .collapse-btn { transform: rotate(180deg); }
+
+    /* ═══════════════════════════════════════════════
+       MAIN CONTENT
+    ═══════════════════════════════════════════════ */
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-w);
+      transition: margin-left var(--transition);
+      display: flex;
+      flex-direction: column;
+      min-height: 100dvh;
+    }
+
+    .main-content.sidebar-collapsed { margin-left: 68px; }
+
+    /* ═══════════════════════════════════════════════
+       HEADER
+    ═══════════════════════════════════════════════ */
+    .header {
+      position: sticky;
+      top: 0;
+      height: var(--header-h);
+      background: var(--header-bg);
+      backdrop-filter: blur(20px) saturate(1.5);
+      -webkit-backdrop-filter: blur(20px) saturate(1.5);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 16px;
+      z-index: 90;
+    }
+
+    .header-title {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      flex: 1;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      width: 38px; height: 38px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-secondary);
+      transition: all var(--transition);
+      position: relative;
+    }
+    .icon-btn:hover {
+      background: var(--accent-subtle);
+      border-color: var(--border-accent);
+      color: var(--accent);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+
+    .icon-btn .dot {
+      position: absolute;
+      top: 6px; right: 6px;
+      width: 7px; height: 7px;
+      background: #ef4444;
+      border-radius: 50%;
+      border: 1.5px solid var(--bg-base);
+    }
+
+    /* ═══════════════════════════════════════════════
+       PAGE CONTENT
+    ═══════════════════════════════════════════════ */
+    .page {
+      flex: 1;
+      padding: 28px 28px;
+      display: none;
+      animation: fadeSlideUp 0.3s ease forwards;
+    }
+    .page.active { display: block; }
+
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══════════════════════════════════════════════
+       CARDS
+    ═══════════════════════════════════════════════ */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: var(--shadow-card);
+      transition: transform var(--transition-spring), box-shadow var(--transition), border-color var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-elevated);
+      border-color: var(--border-accent);
+    }
+
+    .card.glass {
+      background: var(--bg-glass);
+      backdrop-filter: blur(16px) saturate(1.4);
+      -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    }
+
+    /* Stats cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--transition-spring), box-shadow var(--transition), border-color var(--transition);
+    }
+
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: var(--accent-glow);
+      transform: translate(30%, -30%);
+      pointer-events: none;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: var(--shadow-elevated);
+      border-color: var(--border-accent);
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    .stat-change {
+      font-size: 0.75rem;
+      margin-top: 6px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .stat-change.up { color: #22c55e; }
+    .stat-change.down { color: #ef4444; }
+    .stat-change.warn { color: #f59e0b; }
+
+    /* Grid layouts */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .grid-auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+
+    /* Page headings */
+    .page-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      gap: 16px;
+    }
+
+    .page-heading h2 {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .page-heading p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 3px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: rgb(var(--rgb-accent));
+      color: white;
+      box-shadow: 0 4px 16px rgba(var(--rgb-accent), 0.35);
+    }
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(var(--rgb-accent), 0.45);
+    }
+
+    .btn-ghost {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover {
+      background: var(--bg-hover);
+      border-color: var(--border-accent);
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.25);
+    }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
+
+    .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+    .btn-icon { padding: 8px; }
+
+    /* ═══════════════════════════════════════════════
+       MINI CALENDAR
+    ═══════════════════════════════════════════════ */
+    .mini-calendar {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+    }
+
+    .cal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .cal-header h4 {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .cal-nav-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      display: flex; align-items: center;
+      transition: color var(--transition), background var(--transition);
+    }
+    .cal-nav-btn:hover { color: var(--accent); background: var(--accent-subtle); }
+
+    .cal-days-header {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .cal-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
+    }
+
+    .cal-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all var(--transition);
+      color: var(--text-secondary);
+    }
+
+    .cal-day:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .cal-day.today { background: var(--accent-subtle); color: var(--accent); font-weight: 700; border: 1px solid var(--border-accent); }
+    .cal-day.has-event { position: relative; }
+    .cal-day.has-event::after { content: ''; position: absolute; bottom: 2px; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+    .cal-day.warning { color: #f59e0b; background: rgba(245, 158, 11, 0.1); font-weight: 700; }
+    .cal-day.warning::after { background: #f59e0b; }
+    .cal-day.overdue { color: #ef4444; background: rgba(239, 68, 68, 0.1); font-weight: 700; }
+    .cal-day.other-month { opacity: 0.25; }
+
+    /* ═══════════════════════════════════════════════
+       ALERT PILLS / TAGS
+    ═══════════════════════════════════════════════ */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+
+    .tag-green { background: rgba(34, 197, 94, 0.12); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.25); }
+    .tag-amber { background: rgba(245, 158, 11, 0.12); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.25); }
+    .tag-red { background: rgba(239, 68, 68, 0.12); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.25); }
+    .tag-blue { background: rgba(var(--rgb-accent), 0.12); color: rgb(var(--rgb-accent)); border: 1px solid rgba(var(--rgb-accent), 0.25); }
+    .tag-gray { background: var(--bg-elevated); color: var(--text-muted); border: 1px solid var(--border); }
+
+    /* ═══════════════════════════════════════════════
+       MAINTENANCE ITEMS
+    ═══════════════════════════════════════════════ */
+    .maint-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      transition: all var(--transition-spring);
+      cursor: pointer;
+    }
+
+    .maint-item:hover {
+      transform: translateX(4px);
+      border-color: var(--border-accent);
+      background: var(--bg-hover);
+    }
+
+    .maint-icon {
+      width: 40px; height: 40px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.1rem;
+    }
+
+    .maint-info { flex: 1; min-width: 0; }
+    .maint-name { font-weight: 600; font-size: 0.875rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .maint-due { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+    /* ═══════════════════════════════════════════════
+       GUT MATRIX
+    ═══════════════════════════════════════════════ */
+    .gut-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+    .gut-critical { background: rgba(239,68,68,0.15); color: #ef4444; border: 2px solid rgba(239,68,68,0.4); }
+    .gut-high { background: rgba(245,158,11,0.15); color: #f59e0b; border: 2px solid rgba(245,158,11,0.4); }
+    .gut-medium { background: rgba(99,179,237,0.15); color: rgb(var(--rgb-accent)); border: 2px solid rgba(var(--rgb-accent),0.4); }
+    .gut-low { background: rgba(34,197,94,0.15); color: #22c55e; border: 2px solid rgba(34,197,94,0.4); }
+
+    /* ═══════════════════════════════════════════════
+       SETTINGS PAGE
+    ═══════════════════════════════════════════════ */
+    .settings-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .settings-section-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .settings-section-header svg { color: var(--accent); }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      transition: background var(--transition);
+    }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-row:hover { background: var(--bg-hover); }
+
+    .settings-row-info { }
+    .settings-row-label { font-size: 0.875rem; font-weight: 500; }
+    .settings-row-desc { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+    /* Theme Buttons */
+    .theme-options {
+      display: flex;
+      gap: 8px;
+    }
+
+    .theme-btn {
+      width: 36px; height: 36px;
+      border-radius: var(--radius-sm);
+      border: 2px solid var(--border);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      transition: all var(--transition);
+      background: var(--bg-elevated);
+    }
+    .theme-btn.active { border-color: var(--accent); background: var(--accent-subtle); }
+    .theme-btn:hover { border-color: var(--border-accent); }
+
+    /* Toggle switch */
+    .toggle {
+      position: relative;
+      width: 44px; height: 24px;
+      cursor: pointer;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 34px;
+      transition: background var(--transition);
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      left: 3px; top: 3px;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      transition: transform var(--transition), background var(--transition);
+    }
+    .toggle input:checked + .toggle-slider { background: var(--accent); border-color: var(--accent); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(20px); background: white; }
+
+    /* Color picker row */
+    .color-swatch {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: border-color var(--transition), transform var(--transition);
+    }
+    .color-swatch:hover, .color-swatch.active { border-color: white; transform: scale(1.15); }
+
+    .color-swatches { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+    /* RGB slider */
+    .rgb-control { display: flex; flex-direction: column; gap: 8px; }
+    .rgb-row { display: flex; align-items: center; gap: 10px; font-size: 0.78rem; }
+    .rgb-label { width: 12px; font-weight: 700; }
+    .rgb-slider { flex: 1; -webkit-appearance: none; height: 6px; border-radius: 3px; outline: none; cursor: pointer; }
+    .rgb-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: white; border: 2px solid rgba(0,0,0,0.2); cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+
+    /* Font selector */
+    .font-options {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .font-btn {
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all var(--transition);
+      color: var(--text-secondary);
+    }
+    .font-btn.active { border-color: var(--accent); background: var(--accent-subtle); color: var(--accent); }
+    .font-btn:hover { border-color: var(--border-accent); }
+
+    /* ═══════════════════════════════════════════════
+       MODAL / FLOATING WINDOW
+    ═══════════════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition);
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-float);
+      transform: scale(0.95) translateY(10px);
+      transition: transform var(--transition-spring);
+      position: relative;
+    }
+
+    .modal-overlay.open .modal { transform: scale(1) translateY(0); }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h3 {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+
+    .modal-close {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      width: 32px; height: 32px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-secondary);
+      transition: all var(--transition);
+    }
+    .modal-close:hover { background: rgba(239,68,68,0.1); color: #ef4444; border-color: rgba(239,68,68,0.25); }
+
+    /* Form inputs */
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      outline: none;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: rgb(var(--rgb-accent));
+      box-shadow: 0 0 0 3px rgba(var(--rgb-accent), 0.15);
+    }
+    .form-textarea { resize: vertical; min-height: 100px; }
+
+    /* GUT sliders */
+    .gut-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .gut-input { text-align: center; }
+    .gut-input label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); display: block; margin-bottom: 6px; }
+    .gut-input select { text-align: center; }
+    .gut-score { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; padding: 10px; background: var(--bg-card); border-radius: var(--radius-md); border: 1px solid var(--border); }
+    .gut-score-label { font-size: 0.8rem; color: var(--text-muted); }
+    .gut-score-value { font-family: var(--font-display); font-size: 1.4rem; font-weight: 800; }
+
+    /* ═══════════════════════════════════════════════
+       TOAST NOTIFICATIONS
+    ═══════════════════════════════════════════════ */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-elevated);
+      min-width: 280px;
+      max-width: 380px;
+      pointer-events: all;
+      animation: toastIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .toast.removing { animation: toastOut 0.25s ease forwards; }
+
+    @keyframes toastIn { from { opacity: 0; transform: translateX(60px) scale(0.9); } to { opacity: 1; transform: translateX(0) scale(1); } }
+    @keyframes toastOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(60px); } }
+
+    .toast-icon { flex-shrink: 0; }
+    .toast-msg { flex: 1; font-size: 0.85rem; }
+    .toast-title { font-weight: 600; }
+    .toast-sub { font-size: 0.75rem; color: var(--text-muted); }
+
+    /* ═══════════════════════════════════════════════
+       INSTALL BANNER
+    ═══════════════════════════════════════════════ */
+    .install-banner {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius-xl);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: var(--shadow-float);
+      z-index: 800;
+      animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      min-width: 320px;
+    }
+
+    @keyframes slideUp { from { transform: translateX(-50%) translateY(80px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+
+    .install-banner-icon { font-size: 1.5rem; }
+    .install-banner-text { flex: 1; }
+    .install-banner-text strong { display: block; font-weight: 600; font-size: 0.9rem; }
+    .install-banner-text span { font-size: 0.78rem; color: var(--text-muted); }
+    .install-banner.hidden { display: none; }
+
+    /* ═══════════════════════════════════════════════
+       SCROLLBAR
+    ═══════════════════════════════════════════════ */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    /* ═══════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        width: var(--sidebar-w) !important;
+      }
+      .sidebar.mobile-open { transform: translateX(0); }
+      .main-content { margin-left: 0 !important; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .page { padding: 16px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .collapse-btn { display: none; }
+    }
+
+    /* ═══════════════════════════════════════════════
+       SECTION DIVIDER
+    ═══════════════════════════════════════════════ */
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Demand list */
+    .demand-row {
+      display: grid;
+      grid-template-columns: 36px 1fr auto auto auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      transition: all var(--transition-spring);
+      cursor: pointer;
+    }
+    .demand-row:hover {
+      transform: translateX(4px);
+      border-color: var(--border-accent);
+      box-shadow: 0 4px 16px rgba(var(--rgb-accent), 0.1);
+    }
+    .demand-title { font-weight: 500; font-size: 0.875rem; }
+    .demand-meta { font-size: 0.72rem; color: var(--text-muted); }
+
+    /* Log list */
+    .log-item {
+      display: flex;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8rem;
+    }
+    .log-item:last-child { border-bottom: none; }
+    .log-time { color: var(--text-muted); font-family: var(--font-mono); width: 80px; flex-shrink: 0; }
+    .log-msg { color: var(--text-secondary); }
+    .log-msg strong { color: var(--text-primary); }
+
+    /* Range input */
+    input[type="range"] {
+      -webkit-appearance: none;
+      height: 6px;
+      background: var(--bg-elevated);
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(var(--rgb-accent), 0.4);
+    }
+
+    /* Progress bar */
+    .progress-bar { height: 6px; background: var(--bg-elevated); border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.5s ease; }
+    .progress-fill.green { background: #22c55e; }
+    .progress-fill.amber { background: #f59e0b; }
+    .progress-fill.red { background: #ef4444; }
+
+    /* Accent text */
+    .accent { color: rgb(var(--rgb-accent)); }
+    .muted { color: var(--text-muted); }
+    .mt-1 { margin-top: 4px; }
+    .mt-2 { margin-top: 8px; }
+    .mt-3 { margin-top: 16px; }
+    .mb-1 { margin-bottom: 4px; }
+    .mb-2 { margin-bottom: 8px; }
+    .mb-3 { margin-bottom: 16px; }
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-2 { gap: 8px; }
+    .gap-3 { gap: 12px; }
+    .flex-1 { flex: 1; }
+    .text-sm { font-size: 0.85rem; }
+    .text-xs { font-size: 0.75rem; }
+    .font-bold { font-weight: 700; }
+    .w-full { width: 100%; }
+    .gap-list { display: flex; flex-direction: column; gap: 8px; }
+
+    /* Splash / loading */
+    .splash {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-base);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      gap: 20px;
+      transition: opacity 0.5s ease;
+    }
+    .splash.hidden { opacity: 0; pointer-events: none; }
+    .splash-logo { width: 80px; height: 80px; border-radius: 22px; background: linear-gradient(135deg, rgb(var(--rgb-accent)), rgba(var(--rgb-accent), 0.4)); display: flex; align-items: center; justify-content: center; box-shadow: 0 16px 48px rgba(var(--rgb-accent), 0.4); animation: pulseLogo 1.5s ease infinite; }
+    .splash-logo svg { color: white; width: 40px; height: 40px; }
+    @keyframes pulseLogo { 0%,100% { transform: scale(1); box-shadow: 0 16px 48px rgba(var(--rgb-accent), 0.4); } 50% { transform: scale(1.05); box-shadow: 0 20px 60px rgba(var(--rgb-accent), 0.6); } }
+    .splash-title { font-family: var(--font-display); font-size: 2rem; font-weight: 800; }
+    .splash-sub { color: var(--text-muted); font-size: 0.9rem; }
+    .splash-bar { width: 160px; height: 3px; background: var(--bg-elevated); border-radius: 2px; overflow: hidden; }
+    .splash-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; animation: loadBar 1.8s ease forwards; }
+    @keyframes loadBar { from { width: 0; } to { width: 100%; } }
+
+    /* Mobile overlay */
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 99;
+      display: none;
+    }
+    .sidebar-overlay.active { display: block; }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px;
+      cursor: pointer;
+      color: var(--text-primary);
+    }
+    @media (max-width: 768px) { .hamburger { display: flex; align-items: center; } }
+
+    /* Quick actions fab */
+    .fab {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 52px; height: 52px;
+      background: rgb(var(--rgb-accent));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(var(--rgb-accent), 0.45);
+      z-index: 200;
+      transition: all var(--transition-spring);
+      color: white;
+      border: none;
+    }
+    .fab:hover { transform: scale(1.1) rotate(45deg); box-shadow: 0 12px 32px rgba(var(--rgb-accent), 0.6); }
+
+    /* Info chip */
+    .info-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- SPLASH SCREEN -->
+<div class="splash" id="splash">
+  <div class="splash-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+  </div>
+  <div class="splash-title">SindApp</div>
+  <div class="splash-sub">Gestão Condominial Inteligente</div>
+  <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+</div>
+
+<!-- APP SHELL -->
+<div class="app-shell">
+
+  <!-- SIDEBAR OVERLAY (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <button class="collapse-btn" onclick="toggleSidebar()" title="Recolher menu">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+
+    <a href="#" class="sidebar-logo" onclick="return false;">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <div class="sidebar-logo-text">
+        <strong>SindApp</strong>
+        <span>v1.0.0 · 2025</span>
+      </div>
+    </a>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Principal</div>
+      <div class="nav-item active" data-page="dashboard" onclick="navigate(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        <span class="nav-label">Dashboard</span>
+      </div>
+      <div class="nav-item" data-page="demands" onclick="navigate(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span class="nav-label">Demandas</span>
+        <span class="nav-badge">3</span>
+      </div>
+      <div class="nav-item" data-page="gut" onclick="navigate(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+        <span class="nav-label">Matriz GUT</span>
+      </div>
+      <div class="nav-item" data-page="maintenance" onclick="navigate(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+        <span class="nav-label">Manutenções</span>
+        <span class="nav-badge amber">5</span>
+      </div>
+      <div class="nav-item" data-page="suppliers" onclick="navigate(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        <span class="nav-label">Fornecedores</span>
+      </div>
+      <div class="nav-item" data-page="documents" onclick="navigate(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+        <span class="nav-label">Documentos</span>
+      </div>
+      <div class="nav-item" data-page="reports" onclick="navigate(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span class="nav-label">Relatórios</span>
+      </div>
+
+      <div class="sidebar-section-label">IA & Insights</div>
+      <div class="nav-item" data-page="ai" onclick="navigate(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a2 2 0 012 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 017 7h1a1 1 0 110 2h-1v1a2 2 0 01-2 2H5a2 2 0 01-2-2v-1H2a1 1 0 110-2h1a7 7 0 017-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 012-2z"/></svg>
+        <span class="nav-label">IA Análise</span>
+        <span class="nav-badge blue">IA</span>
+      </div>
+      <div class="nav-item" data-page="alerts" onclick="navigate(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="nav-label">Alertas</span>
+        <span class="nav-badge">2</span>
+      </div>
+
+      <div class="sidebar-section-label">Sistema</div>
+      <div class="nav-item" data-page="logs" onclick="navigate(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span class="nav-label">Logs</span>
+      </div>
+      <div class="nav-item" data-page="settings" onclick="navigate(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span class="nav-label">Configurações</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="version-badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span class="nav-label">v1.0.0 · build 250101</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-content" id="mainContent">
+
+    <!-- HEADER -->
+    <header class="header">
+      <button class="hamburger" onclick="openSidebar()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+
+      <h1 class="header-title" id="headerTitle">Dashboard</h1>
+
+      <div class="header-actions">
+        <button class="icon-btn" onclick="showModal('demandModal')" title="Nova demanda">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <button class="icon-btn" onclick="navigate(document.querySelector('[data-page=alerts]'))" title="Alertas">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <span class="dot"></span>
+        </button>
+        <button class="icon-btn" onclick="printPage()" title="Imprimir">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        </button>
+        <button class="icon-btn" onclick="shareApp()" title="Compartilhar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </button>
+        <button class="icon-btn" onclick="navigate(document.querySelector('[data-page=settings]'))" title="Configurações">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ═══════ PAGE: DASHBOARD ═══════ -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-heading">
+        <div>
+          <h2>Visão Geral</h2>
+          <p>Condomínio Residencial • <span id="currentDate"></span></p>
+        </div>
+        <div class="flex gap-2">
+          <span class="info-chip">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+            Online
+          </span>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card" onclick="navigate(document.querySelector('[data-page=demands]'))" style="cursor:pointer">
+          <div class="stat-label">Demandas Abertas</div>
+          <div class="stat-value accent">3</div>
+          <div class="stat-change warn">⚠ 1 urgente</div>
+        </div>
+        <div class="stat-card" onclick="navigate(document.querySelector('[data-page=maintenance]'))" style="cursor:pointer">
+          <div class="stat-label">Manutenções Pendentes</div>
+          <div class="stat-value" style="color:#f59e0b">5</div>
+          <div class="stat-change warn">⚠ Vencendo este mês</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Fornecedores Ativos</div>
+          <div class="stat-value" style="color:#22c55e">12</div>
+          <div class="stat-change up">↑ 2 novos</div>
+        </div>
+        <div class="stat-card" onclick="navigate(document.querySelector('[data-page=alerts]'))" style="cursor:pointer">
+          <div class="stat-label">Alertas Ativos</div>
+          <div class="stat-value" style="color:#ef4444">2</div>
+          <div class="stat-change down">⚠ Requer atenção</div>
+        </div>
+      </div>
+
+      <!-- Grid row -->
+      <div class="grid-2" style="gap:20px; margin-bottom:20px;">
+        <!-- Mini Calendar -->
+        <div class="mini-calendar" id="miniCal"></div>
+
+        <!-- Quick alerts -->
+        <div class="card">
+          <div class="section-title" style="margin-bottom:16px">Próximos Vencimentos</div>
+          <div class="gap-list">
+            <div class="maint-item">
+              <div class="maint-icon" style="background:rgba(239,68,68,0.1); color:#ef4444">🔥</div>
+              <div class="maint-info">
+                <div class="maint-name">Sistema de Combate a Incêndio</div>
+                <div class="maint-due">Vence em 5 dias</div>
+              </div>
+              <span class="tag tag-red">URGENTE</span>
+            </div>
+            <div class="maint-item">
+              <div class="maint-icon" style="background:rgba(245,158,11,0.1); color:#f59e0b">💧</div>
+              <div class="maint-info">
+                <div class="maint-name">Lavagem Caixa d'Água</div>
+                <div class="maint-due">Vence em 18 dias</div>
+              </div>
+              <span class="tag tag-amber">ATENÇÃO</span>
+            </div>
+            <div class="maint-item">
+              <div class="maint-icon" style="background:rgba(245,158,11,0.1); color:#f59e0b">🛡️</div>
+              <div class="maint-info">
+                <div class="maint-name">Renovação Seguro</div>
+                <div class="maint-due">Vence em 22 dias</div>
+              </div>
+              <span class="tag tag-amber">ATENÇÃO</span>
+            </div>
+            <div class="maint-item">
+              <div class="maint-icon" style="background:rgba(99,179,237,0.1); color:rgb(var(--rgb-accent))">🌿</div>
+              <div class="maint-info">
+                <div class="maint-name">Poda de Árvores</div>
+                <div class="maint-due">Vence em 45 dias</div>
+              </div>
+              <span class="tag tag-blue">OK</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent demands + maintenance status -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="section-title" style="margin-bottom:14px">Demandas Recentes</div>
+          <div class="gap-list">
+            <div class="demand-row" onclick="showModal('demandModal')">
+              <div class="gut-badge gut-critical">125</div>
+              <div>
+                <div class="demand-title">Portão eletrônico com defeito</div>
+                <div class="demand-meta">Bloco A • Há 2 dias</div>
+              </div>
+              <span class="tag tag-red">Aberto</span>
+              <span></span><span></span>
+            </div>
+            <div class="demand-row">
+              <div class="gut-badge gut-high">60</div>
+              <div>
+                <div class="demand-title">Infiltração escadaria Bloco B</div>
+                <div class="demand-meta">Bloco B • Há 5 dias</div>
+              </div>
+              <span class="tag tag-amber">Em andamento</span>
+              <span></span><span></span>
+            </div>
+            <div class="demand-row">
+              <div class="gut-badge gut-medium">24</div>
+              <div>
+                <div class="demand-title">Iluminação corredor subsolo</div>
+                <div class="demand-meta">Subsolo • Há 8 dias</div>
+              </div>
+              <span class="tag tag-blue">Aguardando</span>
+              <span></span><span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title" style="margin-bottom:14px">Status Manutenções</div>
+          <div class="gap-list">
+            <div>
+              <div class="flex justify-between mb-1"><span class="text-sm">Extintores</span><span class="text-xs muted">Em dia</span></div>
+              <div class="progress-bar"><div class="progress-fill green" style="width:85%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-1"><span class="text-sm">Dedetização</span><span class="text-xs muted">Vencendo</span></div>
+              <div class="progress-bar"><div class="progress-fill amber" style="width:55%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-1"><span class="text-sm">CFTV</span><span class="text-xs muted">Revisão pendente</span></div>
+              <div class="progress-bar"><div class="progress-fill amber" style="width:40%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-1"><span class="text-sm">Sistema Incêndio</span><span class="text-xs muted">URGENTE</span></div>
+              <div class="progress-bar"><div class="progress-fill red" style="width:10%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-1"><span class="text-sm">Para-raio</span><span class="text-xs muted">Em dia</span></div>
+              <div class="progress-bar"><div class="progress-fill green" style="width:92%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ PAGE: DEMANDAS ═══════ -->
+    <div class="page" id="page-demands">
+      <div class="page-heading">
+        <div><h2>Demandas</h2><p>Gerenciamento de solicitações do condomínio</p></div>
+        <div class="flex gap-2">
+          <button class="btn btn-ghost btn-sm" onclick="startVoice()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            Voz
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="showModal('demandModal')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nova Demanda
+          </button>
+        </div>
+      </div>
+      <div class="gap-list">
+        <div class="demand-row">
+          <div class="gut-badge gut-critical">125</div>
+          <div>
+            <div class="demand-title">Portão eletrônico com defeito – Bloco A</div>
+            <div class="demand-meta">Abertura: 03/01/2025 • Resp: João Silva • #DEM-001</div>
+          </div>
+          <span class="tag tag-red">Aberto</span>
+          <span class="tag tag-gray">Elétrica</span>
+          <button class="btn btn-ghost btn-sm btn-icon" onclick="showModal('photoModal')">📷</button>
+        </div>
+        <div class="demand-row">
+          <div class="gut-badge gut-high">60</div>
+          <div>
+            <div class="demand-title">Infiltração escadaria – Bloco B</div>
+            <div class="demand-meta">Abertura: 28/12/2024 • Resp: Maria Lima • #DEM-002</div>
+          </div>
+          <span class="tag tag-amber">Em andamento</span>
+          <span class="tag tag-gray">Hidráulica</span>
+          <button class="btn btn-ghost btn-sm btn-icon" onclick="showModal('photoModal')">📷</button>
+        </div>
+        <div class="demand-row">
+          <div class="gut-badge gut-medium">24</div>
+          <div>
+            <div class="demand-title">Iluminação corredor subsolo</div>
+            <div class="demand-meta">Abertura: 25/12/2024 • Resp: Carlos Souza • #DEM-003</div>
+          </div>
+          <span class="tag tag-blue">Aguardando</span>
+          <span class="tag tag-gray">Elétrica</span>
+          <button class="btn btn-ghost btn-sm btn-icon" onclick="showModal('photoModal')">📷</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ PAGE: MATRIZ GUT ═══════ -->
+    <div class="page" id="page-gut">
+      <div class="page-heading">
+        <div><h2>Matriz GUT</h2><p>Gravidade · Urgência · Tendência</p></div>
+        <button class="btn btn-primary btn-sm" onclick="showModal('gutModal')">+ Nova Priorização</button>
+      </div>
+      <div class="card mb-3">
+        <div class="section-title">Como funciona a GUT</div>
+        <p class="text-sm" style="color:var(--text-secondary); line-height:1.6">A Matriz GUT prioriza problemas com base em <strong>G</strong>ravidade (impacto), <strong>U</strong>rgência (prazo) e <strong>T</strong>endência (evolução). Pontuação = G × U × T. Quanto maior, mais prioritário.</p>
+      </div>
+      <div class="gap-list">
+        <div class="demand-row">
+          <div class="gut-badge gut-critical">125</div>
+          <div>
+            <div class="demand-title">Portão eletrônico – Bloco A</div>
+            <div class="demand-meta">G:5 × U:5 × T:5 = 125 · CRÍTICO</div>
+          </div>
+          <span class="tag tag-red">Crítico</span>
+          <span class="tag tag-gray">Segurança</span>
+          <span></span>
+        </div>
+        <div class="demand-row">
+          <div class="gut-badge gut-high">60</div>
+          <div>
+            <div class="demand-title">Infiltração escadaria – Bloco B</div>
+            <div class="demand-meta">G:4 × U:5 × T:3 = 60 · ALTO</div>
+          </div>
+          <span class="tag tag-amber">Alto</span>
+          <span class="tag tag-gray">Hidráulica</span>
+          <span></span>
+        </div>
+        <div class="demand-row">
+          <div class="gut-badge gut-medium">24</div>
+          <div>
+            <div class="demand-title">Iluminação corredor</div>
+            <div class="demand-meta">G:3 × U:4 × T:2 = 24 · MÉDIO</div>
+          </div>
+          <span class="tag tag-blue">Médio</span>
+          <span class="tag tag-gray">Elétrica</span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ PAGE: MANUTENÇÕES ═══════ -->
+    <div class="page" id="page-maintenance">
+      <div class="page-heading">
+        <div><h2>Manutenções</h2><p>Controle de todas as manutenções do condomínio</p></div>
+        <button class="btn btn-primary btn-sm">+ Adicionar</button>
+      </div>
+      <div class="grid-auto">
+        <!-- each maintenance category as card -->
+        <div class="card" style="cursor:pointer" onclick="toast('Abrindo histórico: Extintores','🔥')">
+          <div class="flex items-center gap-3 mb-2">
+            <span style="font-size:1.5rem">🔥</span>
+            <div><div class="font-bold">Extintores</div><div class="text-xs muted">Recarga anual</div></div>
+            <span class="tag tag-green" style="margin-left:auto">Em dia</span>
+          </div>
+          <div class="text-xs muted">Último: 15/06/2024 · Próximo: 15/06/2025</div>
+          <div class="progress-bar mt-2"><div class="progress-fill green" style="width:85%"></div></div>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div class="flex items-center gap-3 mb-2">
+            <span style="font-size:1.5rem">💧</span>
+            <div><div class="font-bold">Caixa d'Água</div><div class="text-xs muted">Lavagem semestral</div></div>
+            <span class="tag tag-amber" style="margin-left:auto">Atenção</span>
+          </div>
+          <div class="text-xs muted">Último: 01/07/2024 · Próximo: 18/01/2025</div>
+          <div class="progress-bar mt-2"><div class="progress-fill amber" style="width:42%"></div></div>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div class="flex items-center gap-3 mb-2">
+            <span style="font-size:1.5rem">🪲</span>
+            <div><div class="font-bold">Dedetização</div><div class="text-xs muted">Trimestral</div></div>
+            <span class="tag tag-green" style="margin-left:auto">Em dia</span>
+          </div>
+          <div class="text-xs muted">Último: 20/11/2024 · Próximo: 20/02/2025</div>
+          <div class="progress-bar mt-2"><div class="progress-fill green" style="width:72%"></div></div>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div class="flex items-center gap-3 mb-2">
+            <span style="font-size:1.5rem">⚡</span>
+            <div><div class="font-bold">Para-Raio</div><div class="text-xs muted">Inspeção anual</div></div>
+            <span class="tag tag-green" style="margin-left:auto">Em dia</span>
+          </div>
+          <div class="text-xs muted">Último: 10/03/2024 · Próximo: 10/03/2025</div>
+          <div class="progress-bar mt-2"><div class="progress-fill green" style="width:90%"></div></div>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div class="flex items-center gap-3 mb-2">
+            <span style="font-size:1.5rem">🛡️</span>
+            <div><div class="font-bold">Seguro</div><div class="text-xs muted">Renovação anual</div></div>
+            <span class="tag tag-amber" style="margin-left:auto">Atenção</span>
+          </div>
+          <div class="text-xs muted">Vencimento: 22/01/2025</div>
+          <div class="progress-bar mt-2"><div class="progress-fill amber" style="width:30%"></div></div>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div class="flex items-center gap-3 mb-2">
+            <span style="font-size:1.5rem">🏠</span>
+            <div><div class="font-bold">Telhado</div><div class="text-xs muted">Inspeção anual</div></div>
+            <span class="tag tag-green" style="margin-left:auto">Em dia</span>
+          </div>
+          <div class="text-xs muted">Último: 05/09/2024 · Próximo: 05/09/2025</div>
+          <div class="progress-bar mt-2"><div class="progress-fill green" style="width:78%"></div></div>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div class="flex items-center gap-3 mb-2">
+            <span style="font-size:1.5rem">🌿</span>
+            <div><div class="font-bold">Jardins</div><div class="text-xs muted">Mensal</div></div>
+            <span class="tag tag-blue" style="margin-left:auto">Agendado</span>
+          </div>
+          <div class="text-xs muted">Próximo: 15/01/2025</div>
+          <div class="progress-bar mt-2"><div class="progress-fill green" style="width:95%"></div></div>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div class="flex items-center gap-3 mb-2">
+            <span style="font-size:1.5rem">🚪</span>
+            <div><div class="font-bold">Portões</div><div class="text-xs muted">Manutenção semestral</div></div>
+            <span class="tag tag-red" style="margin-left:auto">Urgente</span>
+          </div>
+          <div class="text-xs muted">Portão A com defeito · Demanda aberta</div>
+          <div class="progress-bar mt-2"><div class="progress-fill red" style="width:15%"></div></div>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div class="flex items-center gap-3 mb-2">
+            <span style="font-size:1.5rem">🚽</span>
+            <div><div class="font-bold">Desentupimentos</div><div class="text-xs muted">Preventivo anual</div></div>
+            <span class="tag tag-green" style="margin-left:auto">Em dia</span>
+          </div>
+          <div class="text-xs muted">Último: 12/08/2024 · Próximo: 12/08/2025</div>
+          <div class="progress-bar mt-2"><div class="progress-fill green" style="width:82%"></div></div>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div class="flex items-center gap-3 mb-2">
+            <span style="font-size:1.5rem">💡</span>
+            <div><div class="font-bold">Iluminação</div><div class="text-xs muted">Inspeção mensal</div></div>
+            <span class="tag tag-amber" style="margin-left:auto">Atenção</span>
+          </div>
+          <div class="text-xs muted">Corredor subsolo com problema</div>
+          <div class="progress-bar mt-2"><div class="progress-fill amber" style="width:55%"></div></div>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div class="flex items-center gap-3 mb-2">
+            <span style="font-size:1.5rem">📹</span>
+            <div><div class="font-bold">CFTV</div><div class="text-xs muted">Revisão semestral</div></div>
+            <span class="tag tag-amber" style="margin-left:auto">Atenção</span>
+          </div>
+          <div class="text-xs muted">Último: 10/07/2024 · Revisão pendente</div>
+          <div class="progress-bar mt-2"><div class="progress-fill amber" style="width:40%"></div></div>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div class="flex items-center gap-3 mb-2">
+            <span style="font-size:1.5rem">📡</span>
+            <div><div class="font-bold">Parabólica</div><div class="text-xs muted">Anual</div></div>
+            <span class="tag tag-green" style="margin-left:auto">Em dia</span>
+          </div>
+          <div class="text-xs muted">Próximo: 08/06/2025</div>
+          <div class="progress-bar mt-2"><div class="progress-fill green" style="width:88%"></div></div>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div class="flex items-center gap-3 mb-2">
+            <span style="font-size:1.5rem">🌲</span>
+            <div><div class="font-bold">Poda / Remoção Árvores</div><div class="text-xs muted">Semestral</div></div>
+            <span class="tag tag-blue" style="margin-left:auto">OK</span>
+          </div>
+          <div class="text-xs muted">Próximo: 45 dias</div>
+          <div class="progress-bar mt-2"><div class="progress-fill green" style="width:70%"></div></div>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div class="flex items-center gap-3 mb-2">
+            <span style="font-size:1.5rem">🔥</span>
+            <div><div class="font-bold">Combate a Incêndio</div><div class="text-xs muted">Anual – SPDA/Sprinklers</div></div>
+            <span class="tag tag-red" style="margin-left:auto">URGENTE</span>
+          </div>
+          <div class="text-xs muted">Vence em 5 dias!</div>
+          <div class="progress-bar mt-2"><div class="progress-fill red" style="width:5%"></div></div>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div class="flex items-center gap-3 mb-2">
+            <span style="font-size:1.5rem">🎨</span>
+            <div><div class="font-bold">Pinturas</div><div class="text-xs muted">A cada 3 anos</div></div>
+            <span class="tag tag-green" style="margin-left:auto">Em dia</span>
+          </div>
+          <div class="text-xs muted">Último: 2022 · Próximo: 2025</div>
+          <div class="progress-bar mt-2"><div class="progress-fill amber" style="width:45%"></div></div>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div class="flex items-center gap-3 mb-2">
+            <span style="font-size:1.5rem">🔧</span>
+            <div><div class="font-bold">Serralheria</div><div class="text-xs muted">Anual</div></div>
+            <span class="tag tag-green" style="margin-left:auto">Em dia</span>
+          </div>
+          <div class="text-xs muted">Próximo: 08/09/2025</div>
+          <div class="progress-bar mt-2"><div class="progress-fill green" style="width:80%"></div></div>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div class="flex items-center gap-3 mb-2">
+            <span style="font-size:1.5rem">🚿</span>
+            <div><div class="font-bold">Hidráulica</div><div class="text-xs muted">Preventivo anual</div></div>
+            <span class="tag tag-blue" style="margin-left:auto">Agendado</span>
+          </div>
+          <div class="text-xs muted">Próximo: 30/01/2025</div>
+          <div class="progress-bar mt-2"><div class="progress-fill green" style="width:65%"></div></div>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div class="flex items-center gap-3 mb-2">
+            <span style="font-size:1.5rem">🧱</span>
+            <div><div class="font-bold">Alvenaria</div><div class="text-xs muted">Inspeção bianual</div></div>
+            <span class="tag tag-green" style="margin-left:auto">Em dia</span>
+          </div>
+          <div class="text-xs muted">Próximo: 2026</div>
+          <div class="progress-bar mt-2"><div class="progress-fill green" style="width:92%"></div></div>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div class="flex items-center gap-3 mb-2">
+            <span style="font-size:1.5rem">🪜</span>
+            <div><div class="font-bold">Escadarias</div><div class="text-xs muted">Inspeção trimestral</div></div>
+            <span class="tag tag-amber" style="margin-left:auto">Atenção</span>
+          </div>
+          <div class="text-xs muted">Infiltração detectada – Bloco B</div>
+          <div class="progress-bar mt-2"><div class="progress-fill amber" style="width:35%"></div></div>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div class="flex items-center gap-3 mb-2">
+            <span style="font-size:1.5rem">⚙️</span>
+            <div><div class="font-bold">Elétrica Geral</div><div class="text-xs muted">Preventivo anual</div></div>
+            <span class="tag tag-green" style="margin-left:auto">Em dia</span>
+          </div>
+          <div class="text-xs muted">Próximo: 20/04/2025</div>
+          <div class="progress-bar mt-2"><div class="progress-fill green" style="width:76%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ PAGE: FORNECEDORES ═══════ -->
+    <div class="page" id="page-suppliers">
+      <div class="page-heading">
+        <div><h2>Fornecedores</h2><p>Gestão de fornecedores e seleção do vencedor</p></div>
+        <button class="btn btn-primary btn-sm">+ Novo Fornecedor</button>
+      </div>
+      <div class="card mb-3">
+        <div class="section-title">Cotação Ativa – Portão Eletrônico</div>
+        <div class="gap-list mt-2">
+          <div class="demand-row" style="grid-template-columns: 1fr auto auto auto auto;">
+            <div><div class="demand-title">⭐ Portões Rápidos Ltda</div><div class="demand-meta">CNPJ: 12.345.678/0001-99 · Tel: (11) 99999-0001</div></div>
+            <span class="text-sm font-bold" style="color:#22c55e">R$ 1.800</span>
+            <span class="tag tag-green">MELHOR PREÇO</span>
+            <button class="btn btn-primary btn-sm" onclick="toast('Fornecedor selecionado como vencedor! ✅','🏆')">Selecionar</button>
+            <span></span>
+          </div>
+          <div class="demand-row" style="grid-template-columns: 1fr auto auto auto auto;">
+            <div><div class="demand-title">Auto Portões SP</div><div class="demand-meta">CNPJ: 98.765.432/0001-11 · Tel: (11) 98888-0002</div></div>
+            <span class="text-sm font-bold">R$ 2.200</span>
+            <span class="tag tag-gray">Cotado</span>
+            <button class="btn btn-ghost btn-sm">Selecionar</button>
+            <span></span>
+          </div>
+          <div class="demand-row" style="grid-template-columns: 1fr auto auto auto auto;">
+            <div><div class="demand-title">Mega Automatizadores</div><div class="demand-meta">CNPJ: 55.444.333/0001-22 · Tel: (11) 97777-0003</div></div>
+            <span class="text-sm font-bold">R$ 2.600</span>
+            <span class="tag tag-gray">Cotado</span>
+            <button class="btn btn-ghost btn-sm">Selecionar</button>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ PAGE: DOCUMENTOS ═══════ -->
+    <div class="page" id="page-documents">
+      <div class="page-heading">
+        <div><h2>Documentos</h2><p>Gestão documental com IA para análise de descarte</p></div>
+        <button class="btn btn-primary btn-sm">+ Adicionar Doc</button>
+      </div>
+      <div class="card mb-3" style="background: linear-gradient(135deg, rgba(var(--rgb-accent),0.08), transparent); border-color: var(--border-accent);">
+        <div class="flex items-center gap-3">
+          <span style="font-size:1.8rem">🤖</span>
+          <div>
+            <div class="font-bold">IA de Análise de Documentos</div>
+            <div class="text-sm muted mt-1">Selecione documentos para a IA analisar se podem ser descartados com segurança, baseado na legislação vigente e boas práticas condominiais.</div>
+          </div>
+          <button class="btn btn-primary" onclick="showModal('aiDocModal')">Analisar com IA</button>
+        </div>
+      </div>
+      <div class="gap-list">
+        <div class="demand-row" style="grid-template-columns: 36px 1fr auto auto auto">
+          <span>📄</span>
+          <div><div class="demand-title">Ficha Funcionário – José Santos (demitido 2019)</div><div class="demand-meta">Admissão: 2015 · Demissão: 2019 · 5 anos de guarda</div></div>
+          <span class="tag tag-red">⚠ Analisar</span>
+          <button class="btn btn-ghost btn-sm" onclick="showModal('aiDocModal')">IA</button>
+          <span></span>
+        </div>
+        <div class="demand-row" style="grid-template-columns: 36px 1fr auto auto auto">
+          <span>📋</span>
+          <div><div class="demand-title">Ata de Assembleia – Março 2020</div><div class="demand-meta">Arquivo: ata_2020_03.pdf · 4 anos</div></div>
+          <span class="tag tag-green">Manter</span>
+          <button class="btn btn-ghost btn-sm" onclick="showModal('aiDocModal')">IA</button>
+          <span></span>
+        </div>
+        <div class="demand-row" style="grid-template-columns: 36px 1fr auto auto auto">
+          <span>🧾</span>
+          <div><div class="demand-title">Nota Fiscal Pintura – 2018</div><div class="demand-meta">NF: 000123 · 7 anos</div></div>
+          <span class="tag tag-amber">Revisar</span>
+          <button class="btn btn-ghost btn-sm" onclick="showModal('aiDocModal')">IA</button>
+          <span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ PAGE: RELATÓRIOS ═══════ -->
+    <div class="page" id="page-reports">
+      <div class="page-heading">
+        <div><h2>Relatórios</h2><p>Gere e exporte relatórios em PDF</p></div>
+      </div>
+      <div class="grid-auto">
+        <div class="card" style="cursor:pointer;" onclick="toast('Gerando PDF: Relatório de Demandas...','📄')">
+          <div style="font-size:2rem; margin-bottom:10px">📊</div>
+          <div class="font-bold mb-1">Relatório de Demandas</div>
+          <div class="text-sm muted">Todas as demandas por período com status e GUT</div>
+          <button class="btn btn-primary btn-sm mt-3 w-full">Gerar PDF</button>
+        </div>
+        <div class="card" style="cursor:pointer;" onclick="toast('Gerando PDF: Relatório de Manutenções...','📄')">
+          <div style="font-size:2rem; margin-bottom:10px">🔧</div>
+          <div class="font-bold mb-1">Relatório de Manutenções</div>
+          <div class="text-sm muted">Histórico e próximas manutenções com alertas</div>
+          <button class="btn btn-primary btn-sm mt-3 w-full">Gerar PDF</button>
+        </div>
+        <div class="card" style="cursor:pointer;" onclick="toast('Gerando PDF: Relatório de Fornecedores...','📄')">
+          <div style="font-size:2rem; margin-bottom:10px">👥</div>
+          <div class="font-bold mb-1">Relatório de Fornecedores</div>
+          <div class="text-sm muted">Cotações, vencedores e histórico de contratos</div>
+          <button class="btn btn-primary btn-sm mt-3 w-full">Gerar PDF</button>
+        </div>
+        <div class="card" style="cursor:pointer;" onclick="toast('Gerando PDF: Relatório Gerencial...','📄')">
+          <div style="font-size:2rem; margin-bottom:10px">🏢</div>
+          <div class="font-bold mb-1">Relatório Gerencial Completo</div>
+          <div class="text-sm muted">Visão geral para assembleias e prestação de contas</div>
+          <button class="btn btn-primary btn-sm mt-3 w-full">Gerar PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ PAGE: IA ═══════ -->
+    <div class="page" id="page-ai">
+      <div class="page-heading">
+        <div><h2>IA & Insights</h2><p>Inteligência artificial para o condomínio</p></div>
+      </div>
+      <div class="grid-2 mb-3">
+        <div class="card glass" style="border-color: var(--border-accent);">
+          <div style="font-size:2rem; margin-bottom:12px">🤖</div>
+          <div class="font-bold mb-1">Análise de Documentos</div>
+          <div class="text-sm muted mb-3">Envie fichas de funcionários ou documentação antiga para a IA analisar se podem ser descartados conforme a legislação.</div>
+          <button class="btn btn-primary" onclick="showModal('aiDocModal')">Usar IA</button>
+        </div>
+        <div class="card glass" style="border-color: var(--border-accent);">
+          <div style="font-size:2rem; margin-bottom:12px">💡</div>
+          <div class="font-bold mb-1">Insights Condominiais</div>
+          <div class="text-sm muted mb-3">A IA analisa padrões de manutenção, demandas e custos para gerar insights e recomendações para o síndico.</div>
+          <button class="btn btn-primary" onclick="toast('Gerando insights com IA...','💡')">Gerar Insights</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title">Insights Recentes</div>
+        <div class="gap-list mt-2">
+          <div style="padding:12px; background:var(--bg-elevated); border-radius:var(--radius-md); border: 1px solid rgba(var(--rgb-accent),0.2);">
+            <div class="flex items-center gap-2 mb-1"><span>💡</span><span class="font-bold text-sm">Padrão detectado: Elétrica</span></div>
+            <div class="text-sm muted">3 das 5 últimas demandas são relacionadas a elétrica. Considere uma revisão preventiva completa do sistema elétrico.</div>
+          </div>
+          <div style="padding:12px; background:var(--bg-elevated); border-radius:var(--radius-md); border: 1px solid rgba(245,158,11,0.2);">
+            <div class="flex items-center gap-2 mb-1"><span>⚠️</span><span class="font-bold text-sm">Alerta: Concentração de vencimentos em Janeiro</span></div>
+            <div class="text-sm muted">5 manutenções vencem em Janeiro. Recomendo distribuir contratos para evitar sobrecarga financeira no mesmo mês.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ PAGE: ALERTAS ═══════ -->
+    <div class="page" id="page-alerts">
+      <div class="page-heading">
+        <div><h2>Alertas</h2><p>Notificações e vencimentos críticos</p></div>
+      </div>
+      <div class="gap-list">
+        <div class="card" style="border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.05);">
+          <div class="flex items-center gap-3">
+            <span style="font-size:1.5rem">🔥</span>
+            <div class="flex-1">
+              <div class="font-bold">Sistema de Combate a Incêndio – VENCENDO!</div>
+              <div class="text-sm muted mt-1">Vence em 5 dias (10/01/2025). Contate a empresa imediatamente.</div>
+            </div>
+            <span class="tag tag-red">CRÍTICO</span>
+          </div>
+          <div class="flex gap-2 mt-3">
+            <button class="btn btn-primary btn-sm" onclick="toast('Abrindo WhatsApp...','💬')">📱 WhatsApp</button>
+            <button class="btn btn-ghost btn-sm">Ver Fornecedor</button>
+          </div>
+        </div>
+        <div class="card" style="border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.05);">
+          <div class="flex items-center gap-3">
+            <span style="font-size:1.5rem">💧</span>
+            <div class="flex-1">
+              <div class="font-bold">Lavagem Caixa d'Água – Atenção</div>
+              <div class="text-sm muted mt-1">Vence em 18 dias (28/01/2025). Agende com antecedência.</div>
+            </div>
+            <span class="tag tag-amber">ATENÇÃO</span>
+          </div>
+          <div class="flex gap-2 mt-3">
+            <button class="btn btn-primary btn-sm" onclick="toast('Abrindo WhatsApp...','💬')">📱 WhatsApp</button>
+            <button class="btn btn-ghost btn-sm">Agendar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ PAGE: LOGS ═══════ -->
+    <div class="page" id="page-logs">
+      <div class="page-heading">
+        <div><h2>Logs do Sistema</h2><p>Histórico de ações e eventos</p></div>
+        <button class="btn btn-ghost btn-sm" onclick="toast('Exportando logs...','📄')">Exportar</button>
+      </div>
+      <div class="card">
+        <div class="log-item"><span class="log-time">10:24:03</span><span class="log-msg"><strong>[DEMANDA]</strong> Nova demanda criada: DEM-003 – Iluminação corredor</span></div>
+        <div class="log-item"><span class="log-time">09:15:41</span><span class="log-msg"><strong>[ALERTA]</strong> Vencimento crítico: Sistema de Incêndio em 5 dias</span></div>
+        <div class="log-item"><span class="log-time">08:50:12</span><span class="log-msg"><strong>[FORNECEDOR]</strong> Cotação adicionada: Portões Rápidos Ltda – R$ 1.800</span></div>
+        <div class="log-item"><span class="log-time">08:30:00</span><span class="log-msg"><strong>[SISTEMA]</strong> Backup automático realizado com sucesso</span></div>
+        <div class="log-item"><span class="log-time">07:00:00</span><span class="log-msg"><strong>[IA]</strong> Análise de documentos concluída: 3 documentos avaliados</span></div>
+        <div class="log-item"><span class="log-time">Ontem</span><span class="log-msg"><strong>[MANUTENÇÃO]</strong> Status atualizado: Dedetização → Em dia</span></div>
+      </div>
+    </div>
+
+    <!-- ═══════ PAGE: CONFIGURAÇÕES ═══════ -->
+    <div class="page" id="page-settings">
+      <div class="page-heading">
+        <div><h2>Configurações</h2><p>Personalize o SindApp do seu jeito</p></div>
+        <span class="info-chip">v1.0.0</span>
+      </div>
+
+      <!-- TEMA -->
+      <div class="settings-section">
+        <div class="settings-section-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          Aparência e Tema
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Modo do Tema</div>
+            <div class="settings-row-desc">Claro, Escuro ou automático pelo sistema</div>
+          </div>
+          <div class="theme-options">
+            <button class="theme-btn" onclick="setTheme('light', this)" title="Claro">☀️</button>
+            <button class="theme-btn active" onclick="setTheme('dark', this)" title="Escuro">🌙</button>
+            <button class="theme-btn" onclick="setTheme('auto', this)" title="Automático">⚙️</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Cor de Destaque</div>
+            <div class="settings-row-desc">Escolha a cor principal do app</div>
+          </div>
+          <div class="color-swatches">
+            <div class="color-swatch active" style="background:#63b3ed" onclick="setAccent('99,179,237', this)" title="Azul"></div>
+            <div class="color-swatch" style="background:#a78bfa" onclick="setAccent('167,139,250', this)" title="Roxo"></div>
+            <div class="color-swatch" style="background:#34d399" onclick="setAccent('52,211,153', this)" title="Verde"></div>
+            <div class="color-swatch" style="background:#f97316" onclick="setAccent('249,115,22', this)" title="Laranja"></div>
+            <div class="color-swatch" style="background:#f43f5e" onclick="setAccent('244,63,94', this)" title="Rosa"></div>
+            <div class="color-swatch" style="background:#facc15" onclick="setAccent('250,204,21', this)" title="Amarelo"></div>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">RGB Personalizado 🎨</div>
+            <div class="settings-row-desc">Ajuste fino da cor de destaque</div>
+          </div>
+          <div class="rgb-control" style="width: 220px;">
+            <div class="rgb-row">
+              <span class="rgb-label" style="color:#f87171">R</span>
+              <input type="range" class="rgb-slider" id="rgbR" min="0" max="255" value="99" oninput="updateRGB()" style="background: linear-gradient(to right, #000, #f00)">
+              <span id="rgbRv" style="width:30px; font-family:var(--font-mono); font-size:0.7rem">099</span>
+            </div>
+            <div class="rgb-row">
+              <span class="rgb-label" style="color:#4ade80">G</span>
+              <input type="range" class="rgb-slider" id="rgbG" min="0" max="255" value="179" oninput="updateRGB()" style="background: linear-gradient(to right, #000, #0f0)">
+              <span id="rgbGv" style="width:30px; font-family:var(--font-mono); font-size:0.7rem">179</span>
+            </div>
+            <div class="rgb-row">
+              <span class="rgb-label" style="color:#60a5fa">B</span>
+              <input type="range" class="rgb-slider" id="rgbB" min="0" max="255" value="237" oninput="updateRGB()" style="background: linear-gradient(to right, #000, #00f)">
+              <span id="rgbBv" style="width:30px; font-family:var(--font-mono); font-size:0.7rem">237</span>
+            </div>
+            <div style="height: 20px; border-radius: 6px; background: rgb(var(--rgb-accent)); border: 1px solid var(--border);" id="rgbPreview"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TIPOGRAFIA -->
+      <div class="settings-section">
+        <div class="settings-section-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+          Tipografia
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Fonte Principal</div>
+            <div class="settings-row-desc">Escolha a fonte dos textos do app</div>
+          </div>
+          <div class="font-options">
+            <button class="font-btn active" onclick="setFont('DM Sans', this)" style="font-family:'DM Sans'">DM Sans</button>
+            <button class="font-btn" onclick="setFont('Outfit', this)" style="font-family:'Outfit'">Outfit</button>
+            <button class="font-btn" onclick="setFont('IBM Plex Sans', this)" style="font-family:'IBM Plex Sans'">IBM Plex</button>
+            <button class="font-btn" onclick="setFont('Space Grotesk', this)" style="font-family:'Space Grotesk'">Space G.</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Fonte Display</div>
+            <div class="settings-row-desc">Fonte dos títulos e headings</div>
+          </div>
+          <div class="font-options">
+            <button class="font-btn active" onclick="setDisplayFont('Syne', this)" style="font-family:'Syne'; font-weight:700">Syne</button>
+            <button class="font-btn" onclick="setDisplayFont('Playfair Display', this)" style="font-family:'Playfair Display'">Playfair</button>
+            <button class="font-btn" onclick="setDisplayFont('Space Grotesk', this)" style="font-family:'Space Grotesk'; font-weight:700">Space G.</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTIFICAÇÕES -->
+      <div class="settings-section">
+        <div class="settings-section-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          Notificações e Alertas
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Alertas por WhatsApp</div>
+            <div class="settings-row-desc">Envio de alertas de vencimento via WhatsApp</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked onchange="toast(this.checked ? 'WhatsApp ativado ✅' : 'WhatsApp desativado','💬')"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Alertar com X dias de antecedência</div>
+            <div class="settings-row-desc">Avisar antes do vencimento</div>
+          </div>
+          <select class="form-select" style="width:auto">
+            <option>7 dias</option><option>15 dias</option><option selected>30 dias</option><option>60 dias</option>
+          </select>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Número WhatsApp</div>
+            <div class="settings-row-desc">Para recebimento dos alertas</div>
+          </div>
+          <input type="text" class="form-input" placeholder="+55 (11) 9 0000-0000" style="width: 200px;" />
+        </div>
+      </div>
+
+      <!-- BACKUP & SYNC -->
+      <div class="settings-section">
+        <div class="settings-section-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+          Backup & Sincronização
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Sincronização GitHub</div>
+            <div class="settings-row-desc">Sincronize dados com repositório GitHub</div>
+          </div>
+          <div class="flex gap-2 items-center">
+            <input type="text" class="form-input" placeholder="github.com/user/repo" style="width: 220px;">
+            <button class="btn btn-ghost btn-sm" onclick="toast('Sincronizando com GitHub...','🔄')">Sync</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Backup Automático</div>
+            <div class="settings-row-desc">Backup diário dos dados</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked onchange="toast(this.checked ? 'Backup automático ativado ✅' : 'Backup desativado','💾')"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Exportar Backup</div>
+            <div class="settings-row-desc">Baixe todos os dados em JSON</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="toast('Exportando backup...','💾')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exportar
+          </button>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Importar Backup</div>
+            <div class="settings-row-desc">Restaure dados de um arquivo JSON</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="toast('Abrindo seletor de arquivo...','📂')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Importar
+          </button>
+        </div>
+      </div>
+
+      <!-- SISTEMA -->
+      <div class="settings-section">
+        <div class="settings-section-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          Sistema
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Versão do App</div>
+            <div class="settings-row-desc">SindApp PWA</div>
+          </div>
+          <span class="info-chip">v1.0.0 · build 250101</span>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Instalar como App</div>
+            <div class="settings-row-desc">Adicione o SindApp à tela inicial</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="installPWA()">Instalar</button>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Nome do Condomínio</div>
+            <div class="settings-row-desc">Exibido nos relatórios e cabeçalhos</div>
+          </div>
+          <input type="text" class="form-input" placeholder="Residencial XYZ" style="width: 200px;" value="Residencial XYZ" />
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Limpar Dados de Demonstração</div>
+            <div class="settings-row-desc">Remove todos os dados de exemplo</div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="toast('Dados de demo removidos','🗑️')">Limpar</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end main-content -->
+</div><!-- end app-shell -->
+
+<!-- ═══════ MODAL: NOVA DEMANDA ═══════ -->
+<div class="modal-overlay" id="demandModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Nova Demanda</h3>
+      <button class="modal-close" onclick="closeModal('demandModal')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Título da Demanda</label>
+      <input type="text" class="form-input" placeholder="Descreva o problema..." />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Categoria</label>
+      <select class="form-select">
+        <option>Elétrica</option><option>Hidráulica</option><option>Alvenaria</option>
+        <option>Portões</option><option>CFTV</option><option>Jardins</option>
+        <option>Serralheria</option><option>Pintura</option><option>Outro</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Localização</label>
+      <input type="text" class="form-input" placeholder="Ex: Bloco A, Subsolo, Hall..." />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descrição detalhada</label>
+      <textarea class="form-textarea" placeholder="Detalhe o problema..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Matriz GUT</label>
+      <div class="gut-grid">
+        <div class="gut-input">
+          <label>Gravidade</label>
+          <select class="form-select" id="g" onchange="calcGUT()">
+            <option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option>
+          </select>
+        </div>
+        <div class="gut-input">
+          <label>Urgência</label>
+          <select class="form-select" id="u" onchange="calcGUT()">
+            <option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option>
+          </select>
+        </div>
+        <div class="gut-input">
+          <label>Tendência</label>
+          <select class="form-select" id="t" onchange="calcGUT()">
+            <option>1</option><option>2</option><option>3</option><option selected>3</option><option>5</option>
+          </select>
+        </div>
+      </div>
+      <div class="gut-score">
+        <span class="gut-score-label">Score GUT:</span>
+        <span class="gut-score-value accent" id="gutResult">48</span>
+        <span class="gut-score-label" id="gutLevel">— MÉDIO</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">📷 Foto Antes (opcional)</label>
+      <input type="file" class="form-input" accept="image/*" capture="environment" />
+    </div>
+    <div style="display: flex; gap:10px; justify-content:flex-end; margin-top:8px">
+      <button class="btn btn-ghost" onclick="closeModal('demandModal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveDemand()">Salvar Demanda</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ MODAL: GUT ═══════ -->
+<div class="modal-overlay" id="gutModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Nova Priorização GUT</h3>
+      <button class="modal-close" onclick="closeModal('gutModal')">✕</button>
+    </div>
+    <p class="text-sm muted mb-3">Avalie o problema pelos três critérios e gere o score de prioridade automaticamente.</p>
+    <div class="form-group">
+      <label class="form-label">Problema / Demanda</label>
+      <input type="text" class="form-input" placeholder="Qual o problema a priorizar?" />
+    </div>
+    <div class="gut-grid">
+      <div class="gut-input">
+        <label>Gravidade (1–5)</label>
+        <select class="form-select">
+          <option>1 – Sem gravidade</option><option>2 – Pouco grave</option><option>3 – Grave</option><option selected>4 – Muito grave</option><option>5 – Extremamente grave</option>
+        </select>
+      </div>
+      <div class="gut-input">
+        <label>Urgência (1–5)</label>
+        <select class="form-select">
+          <option>1 – Pode esperar</option><option>2 – Pouco urgente</option><option>3 – Urgente</option><option selected>4 – Muito urgente</option><option>5 – Ação imediata</option>
+        </select>
+      </div>
+      <div class="gut-input">
+        <label>Tendência (1–5)</label>
+        <select class="form-select">
+          <option>1 – Não muda</option><option>2 – Piora levemente</option><option selected>3 – Piora a médio prazo</option><option>4 – Piora a curto prazo</option><option>5 – Piora rapidamente</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:16px">
+      <button class="btn btn-ghost" onclick="closeModal('gutModal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="closeModal('gutModal'); toast('Priorização GUT salva!','✅')">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ MODAL: FOTO ═══════ -->
+<div class="modal-overlay" id="photoModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>📷 Registro Fotográfico</h3>
+      <button class="modal-close" onclick="closeModal('photoModal')">✕</button>
+    </div>
+    <div class="grid-2" style="gap:12px">
+      <div>
+        <label class="form-label">Foto ANTES</label>
+        <div style="background:var(--bg-elevated); border: 2px dashed var(--border); border-radius: var(--radius-md); height:140px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; gap:8px;" onclick="this.querySelector('input').click()">
+          <span style="font-size:2rem">📸</span>
+          <span class="text-xs muted">Clique para tirar/selecionar</span>
+          <input type="file" accept="image/*" capture="environment" hidden />
+        </div>
+      </div>
+      <div>
+        <label class="form-label">Foto DEPOIS</label>
+        <div style="background:var(--bg-elevated); border: 2px dashed var(--border); border-radius: var(--radius-md); height:140px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; gap:8px;" onclick="this.querySelector('input').click()">
+          <span style="font-size:2rem">✅</span>
+          <span class="text-xs muted">Clique para tirar/selecionar</span>
+          <input type="file" accept="image/*" capture="environment" hidden />
+        </div>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:16px">
+      <button class="btn btn-ghost" onclick="closeModal('photoModal')">Fechar</button>
+      <button class="btn btn-primary" onclick="closeModal('photoModal'); toast('Fotos salvas!','📷')">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ MODAL: IA DOCS ═══════ -->
+<div class="modal-overlay" id="aiDocModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>🤖 IA – Análise de Documento</h3>
+      <button class="modal-close" onclick="closeModal('aiDocModal')">✕</button>
+    </div>
+    <div style="background:rgba(var(--rgb-accent),0.06); border:1px solid var(--border-accent); border-radius:var(--radius-md); padding:14px; margin-bottom:16px;">
+      <div class="text-sm muted">A IA analisa os dados do documento e responde se ele <strong>pode ou não pode ser descartado</strong>, com base na CLT, legislação condominial e boas práticas.</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tipo de Documento</label>
+      <select class="form-select">
+        <option>Ficha de Funcionário</option>
+        <option>Nota Fiscal</option>
+        <option>Ata de Assembleia</option>
+        <option>Contrato de Prestação de Serviço</option>
+        <option>Documentação Financeira</option>
+        <option>Outro</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Ano do Documento</label>
+      <input type="number" class="form-input" placeholder="Ex: 2018" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descrição (opcional)</label>
+      <textarea class="form-textarea" placeholder="Detalhe o documento para a IA..." style="min-height:70px;"></textarea>
+    </div>
+    <div id="aiResult" style="display:none; background:var(--bg-elevated); border-radius:var(--radius-md); padding:14px; border:1px solid var(--border-accent); margin-bottom:16px;">
+      <div class="flex items-center gap-2 mb-2"><span>🤖</span><span class="font-bold text-sm">Análise da IA</span></div>
+      <div id="aiResultText" class="text-sm" style="line-height:1.6;"></div>
+    </div>
+    <div style="display:flex; gap:10px; justify-content:flex-end;">
+      <button class="btn btn-ghost" onclick="closeModal('aiDocModal')">Fechar</button>
+      <button class="btn btn-primary" onclick="runAI()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a2 2 0 012 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 017 7h1a1 1 0 110 2h-1v1a2 2 0 01-2 2H5a2 2 0 01-2-2v-1H2a1 1 0 110-2h1a7 7 0 017-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 012-2z"/></svg>
+        Analisar com IA
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- INSTALL BANNER -->
+<div class="install-banner hidden" id="installBanner">
+  <div class="install-banner-icon">📲</div>
+  <div class="install-banner-text">
+    <strong>Instale o SindApp</strong>
+    <span>Acesso rápido sem navegador</span>
+  </div>
+  <button class="btn btn-primary btn-sm" onclick="installPWA()">Instalar</button>
+  <button class="btn btn-ghost btn-sm btn-icon" onclick="document.getElementById('installBanner').classList.add('hidden')">✕</button>
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="showModal('demandModal')" title="Nova Demanda" id="fab">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+</button>
+
+<!-- SERVICE WORKER & APP JS -->
+<script>
+  // ═══════════════════════════════════════
+  // NAVIGATION
+  // ═══════════════════════════════════════
+  const pages = {
+    'dashboard': 'Dashboard',
+    'demands': 'Demandas',
+    'gut': 'Matriz GUT',
+    'maintenance': 'Manutenções',
+    'suppliers': 'Fornecedores',
+    'documents': 'Documentos',
+    'reports': 'Relatórios',
+    'ai': 'IA & Insights',
+    'alerts': 'Alertas',
+    'logs': 'Logs',
+    'settings': 'Configurações'
+  };
+
+  function navigate(el) {
+    const page = el.dataset.page;
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    document.getElementById('headerTitle').textContent = pages[page] || 'SindApp';
+    // close mobile sidebar
+    closeSidebar();
+    // hide FAB on settings
+    document.getElementById('fab').style.display = page === 'settings' ? 'none' : '';
+  }
+
+  // ═══════════════════════════════════════
+  // SIDEBAR COLLAPSE
+  // ═══════════════════════════════════════
+  let sidebarCollapsed = false;
+  function toggleSidebar() {
+    sidebarCollapsed = !sidebarCollapsed;
+    const sb = document.getElementById('sidebar');
+    const mc = document.getElementById('mainContent');
+    sb.classList.toggle('collapsed', sidebarCollapsed);
+    mc.classList.toggle('sidebar-collapsed', sidebarCollapsed);
+  }
+
+  function openSidebar() {
+    document.getElementById('sidebar').classList.add('mobile-open');
+    document.getElementById('sidebarOverlay').classList.add('active');
+  }
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('mobile-open');
+    document.getElementById('sidebarOverlay').classList.remove('active');
+  }
+
+  // ═══════════════════════════════════════
+  // MODAL SYSTEM
+  // ═══════════════════════════════════════
+  function showModal(id) {
+    document.getElementById(id).classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  // Close on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(ov => {
+    ov.addEventListener('click', e => {
+      if (e.target === ov) closeModal(ov.id);
+    });
+  });
+
+  // ═══════════════════════════════════════
+  // TOAST SYSTEM
+  // ═══════════════════════════════════════
+  function toast(msg, icon = 'ℹ️', sub = '') {
+    const container = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.innerHTML = `
+      <span class="toast-icon" style="font-size:1.2rem">${icon}</span>
+      <div class="toast-msg">
+        <div class="toast-title">${msg}</div>
+        ${sub ? `<div class="toast-sub">${sub}</div>` : ''}
+      </div>
+    `;
+    container.appendChild(t);
+    setTimeout(() => {
+      t.classList.add('removing');
+      setTimeout(() => t.remove(), 300);
+    }, 3500);
+    // log it
+    addLog(msg);
+  }
+
+  // ═══════════════════════════════════════
+  // THEME SYSTEM
+  // ═══════════════════════════════════════
+  function setTheme(theme, btn) {
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (theme === 'auto') {
+      const pref = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', pref);
+    } else {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+    localStorage.setItem('sindapp-theme', theme);
+    toast(`Tema ${theme} aplicado`, '🎨');
+  }
+
+  function setAccent(rgb, swatch) {
+    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+    swatch.classList.add('active');
+    document.documentElement.style.setProperty('--rgb-accent', rgb);
+    // sync RGB sliders
+    const [r,g,b] = rgb.split(',').map(v => parseInt(v.trim()));
+    document.getElementById('rgbR').value = r;
+    document.getElementById('rgbG').value = g;
+    document.getElementById('rgbB').value = b;
+    updateRGBDisplay(r,g,b);
+    localStorage.setItem('sindapp-accent', rgb);
+  }
+
+  function updateRGB() {
+    const r = parseInt(document.getElementById('rgbR').value);
+    const g = parseInt(document.getElementById('rgbG').value);
+    const b = parseInt(document.getElementById('rgbB').value);
+    updateRGBDisplay(r,g,b);
+    document.documentElement.style.setProperty('--rgb-accent', `${r},${g},${b}`);
+    localStorage.setItem('sindapp-accent', `${r},${g},${b}`);
+  }
+
+  function updateRGBDisplay(r,g,b) {
+    document.getElementById('rgbRv').textContent = String(r).padStart(3,'0');
+    document.getElementById('rgbGv').textContent = String(g).padStart(3,'0');
+    document.getElementById('rgbBv').textContent = String(b).padStart(3,'0');
+  }
+
+  function setFont(font, btn) {
+    document.querySelectorAll('.font-btn').forEach(b => {
+      if (!b.onclick.toString().includes('DisplayFont')) b.classList.remove('active');
+    });
+    btn.classList.add('active');
+    document.documentElement.style.setProperty('--font-body', `'${font}', sans-serif`);
+    localStorage.setItem('sindapp-font', font);
+    toast(`Fonte alterada: ${font}`, '✏️');
+  }
+
+  function setDisplayFont(font, btn) {
+    btn.classList.add('active');
+    document.documentElement.style.setProperty('--font-display', `'${font}', sans-serif`);
+    localStorage.setItem('sindapp-font-display', font);
+    toast(`Fonte display: ${font}`, '✏️');
+  }
+
+  // ═══════════════════════════════════════
+  // GUT CALCULATOR
+  // ═══════════════════════════════════════
+  function calcGUT() {
+    const g = parseInt(document.getElementById('g').value);
+    const u = parseInt(document.getElementById('u').value);
+    const t = parseInt(document.getElementById('t').value);
+    const score = g * u * t;
+    document.getElementById('gutResult').textContent = score;
+    let level, color;
+    if (score >= 100) { level = 'CRÍTICO'; color = '#ef4444'; }
+    else if (score >= 50) { level = 'ALTO'; color = '#f59e0b'; }
+    else if (score >= 20) { level = 'MÉDIO'; color = 'rgb(var(--rgb-accent))'; }
+    else { level = 'BAIXO'; color = '#22c55e'; }
+    document.getElementById('gutLevel').textContent = `— ${level}`;
+    document.getElementById('gutResult').style.color = color;
+  }
+
+  // ═══════════════════════════════════════
+  // AI MOCK
+  // ═══════════════════════════════════════
+  const aiResponses = [
+    '✅ <strong>PODE DESCARTAR</strong><br>Fichas de funcionários demitidos podem ser descartadas após 5 anos conforme o art. 11 da CLT e Resolução CFM. O prazo prescricional trabalhista foi atendido. Recomendo digitalizar antes de descartar.',
+    '⚠️ <strong>MANTER POR PRECAUÇÃO</strong><br>Documentos financeiros devem ser guardados por pelo menos 5 anos conforme o Código Tributário Nacional (CTN art. 174). Avaliar se há pendências fiscais antes do descarte.',
+    '❌ <strong>NÃO PODE DESCARTAR</strong><br>Atas de assembleias condominiais são documentos permanentes e devem ser conservadas indefinidamente conforme a Lei 4.591/64. Digitalize e mantenha o original.'
+  ];
+
+  function runAI() {
+    const resultEl = document.getElementById('aiResult');
+    const textEl = document.getElementById('aiResultText');
+    textEl.innerHTML = '⏳ Analisando...';
+    resultEl.style.display = 'block';
+    setTimeout(() => {
+      textEl.innerHTML = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+    }, 1800);
+  }
+
+  // ═══════════════════════════════════════
+  // SAVE DEMAND MOCK
+  // ═══════════════════════════════════════
+  function saveDemand() {
+    closeModal('demandModal');
+    toast('Demanda criada com sucesso!', '✅', '#DEM-004 adicionada');
+    addLog('[DEMANDA] Nova demanda criada via modal');
+  }
+
+  // ═══════════════════════════════════════
+  // LOGS
+  // ═══════════════════════════════════════
+  function addLog(msg) {
+    const logPage = document.getElementById('page-logs').querySelector('.card');
+    const now = new Date();
+    const time = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+    const item = document.createElement('div');
+    item.className = 'log-item';
+    item.innerHTML = `<span class="log-time">${time}</span><span class="log-msg">${msg}</span>`;
+    logPage.insertBefore(item, logPage.firstChild);
+  }
+
+  // ═══════════════════════════════════════
+  // MINI CALENDAR
+  // ═══════════════════════════════════════
+  function renderCalendar() {
+    const cal = document.getElementById('miniCal');
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+    // Demo alert days (vencimentos)
+    const alertDays = [10, 18, 22]; // urgente, atenção, atenção
+    const warningDays = [18, 22, 28];
+    const overdueDays = [10];
+
+    let html = `
+      <div class="cal-header">
+        <button class="cal-nav-btn">‹</button>
+        <h4>${months[month]} ${year}</h4>
+        <button class="cal-nav-btn">›</button>
+      </div>
+      <div class="cal-days-header">
+        <span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span>
+      </div>
+      <div class="cal-days">
+    `;
+
+    for (let i = 0; i < firstDay; i++) {
+      html += `<div class="cal-day other-month"></div>`;
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      let cls = 'cal-day';
+      if (d === now.getDate()) cls += ' today';
+      else if (overdueDays.includes(d)) cls += ' overdue has-event';
+      else if (warningDays.includes(d)) cls += ' warning has-event';
+      else if (alertDays.includes(d)) cls += ' has-event';
+      html += `<div class="${cls}">${d}</div>`;
+    }
+
+    html += `</div>`;
+    cal.innerHTML = html;
+  }
+
+  // ═══════════════════════════════════════
+  // DATE DISPLAY
+  // ═══════════════════════════════════════
+  function setDate() {
+    const now = new Date();
+    const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('currentDate').textContent = now.toLocaleDateString('pt-BR', opts);
+  }
+
+  // ═══════════════════════════════════════
+  // PWA INSTALL
+  // ═══════════════════════════════════════
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    setTimeout(() => {
+      document.getElementById('installBanner').classList.remove('hidden');
+    }, 2000);
+  });
+
+  function installPWA() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(r => {
+        if (r.outcome === 'accepted') toast('SindApp instalado com sucesso!','🎉');
+        deferredPrompt = null;
+        document.getElementById('installBanner').classList.add('hidden');
+      });
+    } else {
+      toast('Para instalar: Menu do navegador → "Adicionar à tela inicial"', '📱');
+    }
+  }
+
+  // ═══════════════════════════════════════
+  // PRINT & SHARE
+  // ═══════════════════════════════════════
+  function printPage() {
+    window.print();
+  }
+
+  function shareApp() {
+    if (navigator.share) {
+      navigator.share({ title: 'SindApp', text: 'Gestão Condominial Inteligente', url: window.location.href });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      toast('Link copiado para a área de transferência!', '🔗');
+    }
+  }
+
+  // ═══════════════════════════════════════
+  // VOICE INPUT
+  // ═══════════════════════════════════════
+  function startVoice() {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const rec = new SR();
+      rec.lang = 'pt-BR';
+      rec.start();
+      toast('Ouvindo... fale a demanda!', '🎤');
+      rec.onresult = e => {
+        const text = e.results[0][0].transcript;
+        showModal('demandModal');
+        document.querySelector('#demandModal input[type=text]').value = text;
+        toast(`Texto captado: "${text}"`, '✅');
+      };
+      rec.onerror = () => toast('Erro no reconhecimento de voz', '❌');
+    } else {
+      toast('Reconhecimento de voz não suportado neste navegador', '⚠️');
+    }
+  }
+
+  // ═══════════════════════════════════════
+  // LOAD SAVED SETTINGS
+  // ═══════════════════════════════════════
+  function loadSettings() {
+    const theme = localStorage.getItem('sindapp-theme') || 'dark';
+    const accent = localStorage.getItem('sindapp-accent') || '99,179,237';
+    const font = localStorage.getItem('sindapp-font') || 'DM Sans';
+    const displayFont = localStorage.getItem('sindapp-font-display') || 'Syne';
+
+    document.documentElement.setAttribute('data-theme', theme === 'auto' ?
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme);
+    document.documentElement.style.setProperty('--rgb-accent', accent);
+    document.documentElement.style.setProperty('--font-body', `'${font}', sans-serif`);
+    document.documentElement.style.setProperty('--font-display', `'${displayFont}', sans-serif`);
+
+    const [r,g,b] = accent.split(',').map(v => parseInt(v.trim()));
+    document.getElementById('rgbR').value = r;
+    document.getElementById('rgbG').value = g;
+    document.getElementById('rgbB').value = b;
+    updateRGBDisplay(r,g,b);
+  }
+
+  // ═══════════════════════════════════════
+  // INIT
+  // ═══════════════════════════════════════
+  window.addEventListener('DOMContentLoaded', () => {
+    // Splash out
+    setTimeout(() => {
+      document.getElementById('splash').classList.add('hidden');
+      setTimeout(() => document.getElementById('splash').remove(), 600);
+    }, 2000);
+
+    loadSettings();
+    setDate();
+    renderCalendar();
+    calcGUT();
+
+    // Welcome toast
+    setTimeout(() => toast('Bem-vindo ao SindApp! 🏢', '👋', 'Sistema pronto para uso'), 2200);
+
+    lucide && lucide.createIcons && lucide.createIcons();
+  });
+
+  // ═══════════════════════════════════════
+  // SERVICE WORKER REGISTER
+  // ═══════════════════════════════════════
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log('[SindApp] SW registrado'))
+        .catch(err => console.log('[SindApp] SW falhou:', err));
+    });
+  }
+</script>
+</body>
+</html>
